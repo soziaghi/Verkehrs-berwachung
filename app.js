@@ -25,6 +25,77 @@ const statusText = document.getElementById("statusText");
 let refreshTimer = null;
 let lastItems = [];
 
+const NUERNBERG_COORD = { lat: 49.4521, lon: 11.0767 };
+
+// Grobe Zentroiden je Bundesland, nur zur Zuordnung einzelner Meldungen per
+// Koordinaten-Nächster-Nachbar-Suche — keine exakten Grenzen.
+const BUNDESLAND_CENTROIDS = {
+  "Bayern": [48.79, 11.4],
+  "Baden-Württemberg": [48.66, 9.35],
+  "Thüringen": [50.9, 11.0],
+  "Hessen": [50.52, 9.0],
+  "Sachsen": [51.05, 13.2],
+  "Rheinland-Pfalz": [49.91, 7.45],
+  "Sachsen-Anhalt": [51.9, 11.6],
+  "Saarland": [49.4, 6.97],
+  "Nordrhein-Westfalen": [51.43, 7.45],
+  "Brandenburg": [52.4, 13.1],
+  "Niedersachsen": [52.7, 9.5],
+  "Berlin": [52.52, 13.4],
+  "Bremen": [53.08, 8.8],
+  "Hamburg": [53.55, 10.0],
+  "Mecklenburg-Vorpommern": [53.7, 12.9],
+  "Schleswig-Holstein": [54.3, 9.7],
+};
+
+function distanceKm(lat1, lon1, lat2, lon2) {
+  const dLat = (lat1 - lat2) * 111;
+  const dLon = (lon1 - lon2) * 111 * Math.cos((lat1 * Math.PI) / 180);
+  return Math.sqrt(dLat * dLat + dLon * dLon);
+}
+
+// Bayern zuerst (enthält das Ziel Nürnberg), danach aufsteigend nach
+// Luftlinien-Entfernung der Zentroide von Nürnberg sortiert.
+const BUNDESLAND_ORDER = Object.keys(BUNDESLAND_CENTROIDS)
+  .sort((a, b) => {
+    if (a === "Bayern") return -1;
+    if (b === "Bayern") return 1;
+    const [latA, lonA] = BUNDESLAND_CENTROIDS[a];
+    const [latB, lonB] = BUNDESLAND_CENTROIDS[b];
+    const dA = distanceKm(NUERNBERG_COORD.lat, NUERNBERG_COORD.lon, latA, lonA);
+    const dB = distanceKm(NUERNBERG_COORD.lat, NUERNBERG_COORD.lon, latB, lonB);
+    return dA - dB;
+  })
+  .concat("Unbekannt");
+
+function itemCoord(item) {
+  if (item.coordinate && item.coordinate.lat != null && item.coordinate.long != null) {
+    return { lat: Number(item.coordinate.lat), lon: Number(item.coordinate.long) };
+  }
+  if (typeof item.point === "string") {
+    const parts = item.point.split(",").map(Number);
+    if (parts.length === 2 && parts.every((n) => !Number.isNaN(n))) {
+      return { lat: parts[0], lon: parts[1] };
+    }
+  }
+  return null;
+}
+
+function classifyBundesland(item) {
+  const coord = itemCoord(item);
+  if (!coord) return "Unbekannt";
+  let best = "Unbekannt";
+  let bestDist = Infinity;
+  for (const [land, [lat, lon]] of Object.entries(BUNDESLAND_CENTROIDS)) {
+    const d = distanceKm(coord.lat, coord.lon, lat, lon);
+    if (d < bestDist) {
+      bestDist = d;
+      best = land;
+    }
+  }
+  return best;
+}
+
 function isDirectionNuernberg(item) {
   const subtitle = item.subtitle || "";
   const arrowParts = subtitle.split("->");
@@ -149,24 +220,31 @@ function renderOthers(others) {
     return;
   }
 
-  ROADS.forEach((road) => {
-    const roadItems = others.filter((item) => item.road === road);
-    if (!roadItems.length) return;
+  const byLand = new Map();
+  others.forEach((item) => {
+    const land = classifyBundesland(item);
+    if (!byLand.has(land)) byLand.set(land, []);
+    byLand.get(land).push(item);
+  });
+
+  BUNDESLAND_ORDER.forEach((land) => {
+    const landItems = byLand.get(land);
+    if (!landItems || !landItems.length) return;
 
     const details = document.createElement("details");
     details.className = "road-group";
 
     const summary = document.createElement("summary");
-    summary.textContent = `${road} `;
+    summary.textContent = `${land} `;
     const count = document.createElement("span");
     count.className = "count";
-    count.textContent = FEEDER_ROADS.includes(road)
-      ? `(${roadItems.length} · beide Richtungen)`
-      : `(${roadItems.length})`;
+    count.textContent = `(${landItems.length})`;
     summary.appendChild(count);
     details.appendChild(summary);
 
-    roadItems.forEach((item) => details.appendChild(buildRow(item)));
+    landItems
+      .sort((a, b) => a.road.localeCompare(b.road))
+      .forEach((item) => details.appendChild(buildRow(item)));
     otherList.appendChild(details);
   });
 }
@@ -178,6 +256,14 @@ function buildRow(item) {
   const toggle = document.createElement("button");
   toggle.className = "row-toggle";
   toggle.type = "button";
+
+  const roadBadge = document.createElement("span");
+  roadBadge.className = "road-badge";
+  roadBadge.textContent = item.road;
+  roadBadge.title = FEEDER_ROADS.includes(item.road)
+    ? "Zubringer-Autobahn — beide Richtungen"
+    : "Kern-Autobahn — Richtung Nürnberg";
+  toggle.appendChild(roadBadge);
 
   const title = document.createElement("span");
   title.className = "row-title";
