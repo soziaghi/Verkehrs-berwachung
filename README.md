@@ -1,7 +1,8 @@
-# Autobahn-Überwachung A3 / A9 / A6 (Richtung Nürnberg)
+# Autobahn-Überwachung: 45 Standorte → Nürnberg
 
 Reine Frontend-Web-App (kein Server/Build nötig), die Vollsperrungen und andere
-Verkehrsmeldungen für die A3, A9 und A6 in Fahrtrichtung Nürnberg anzeigt.
+Verkehrsmeldungen auf den Autobahnrouten von 45 Firmenstandorten zum Ziel
+Koblenzerstr. 13, 90451 Nürnberg anzeigt.
 
 ## Nutzung
 
@@ -18,12 +19,23 @@ erlaubt — es ist kein eigener Backend-Proxy nötig.
 
 ## Funktionsweise
 
-- Für A3, A9 und A6 werden die Endpunkte `roadworks`, `closure` und `warning`
-  abgefragt.
-- Einträge werden anhand von `subtitle` (z. B. „Würzburg -> Nürnberg“) und
-  Beschreibungstexten („Richtung Nürnberg“) auf die Fahrtrichtung Nürnberg
-  gefiltert. Über die Checkbox „auch andere Fahrtrichtungen anzeigen“ lässt
-  sich der Filter deaktivieren.
+- 18 Autobahnen werden abgedeckt, aufgeteilt in:
+  - **Kern-Autobahnen** (`A3`, `A6`, `A9`, `A73`, `A93`) — führen direkt auf
+    Nürnberg zu. Hier bleibt der Richtungsfilter aktiv: Einträge werden
+    anhand von `subtitle` (z. B. „Würzburg -> Nürnberg“) und Beschreibungs­text
+    („Richtung Nürnberg“) auf die Fahrtrichtung Nürnberg gefiltert.
+  - **Zubringer-Autobahnen** (`A1`, `A2`, `A4`, `A5`, `A7`, `A8`, `A13`,
+    `A71`, `A81`, `A92`, `A95`, `A99`, `A113`) — werden auf den Strecken der
+    45 Standorte zur Anbindung an die Kern-Autobahnen benötigt, liegen aber
+    zu weit von Nürnberg entfernt, als dass ihre Richtungsangaben „Nürnberg“
+    nennen würden. Hier werden beide Richtungen angezeigt, um keine
+    Vollsperrung zu verpassen.
+  - Für jede Autobahn werden die Endpunkte `roadworks`, `closure` und
+    `warning` abgefragt.
+  - Über die Checkbox „auch Gegenrichtung der Kern-Autobahnen anzeigen“
+    lässt sich der Richtungsfilter für die Kern-Autobahnen deaktivieren.
+  - Welche Autobahn(en) zu welchem der 45 Standorte gehören, ist in der
+    ursprünglichen Streckenprüfung dokumentiert (mit dem Nutzer abgestimmt).
 - Eine Meldung gilt als **Vollsperrung**, wenn das API-Feld `isBlocked` gesetzt
   ist oder Titel/Beschreibung Begriffe wie „Vollsperrung“ / „komplett
   gesperrt“ / „in beide Richtungen gesperrt“ enthalten. Vollsperrungen werden

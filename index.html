@@ -3,19 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Autobahn-Überwachung · A3 / A9 / A6 Richtung Nürnberg</title>
+  <title>Autobahn-Überwachung · 45 Standorte → Nürnberg</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="app-header">
     <div class="header-inner">
       <h1>🚧 Autobahn-Überwachung</h1>
-      <p class="subtitle">A3 · A9 · A6 — Fahrtrichtung Nürnberg</p>
+      <p class="subtitle">18 Autobahnen · Ziel: Koblenzerstr. 13, 90451 Nürnberg</p>
     </div>
-    <div class="road-status" id="roadStatus">
-      <div class="road-chip" data-road="A3"><span class="dot"></span> A3</div>
-      <div class="road-chip" data-road="A9"><span class="dot"></span> A9</div>
-      <div class="road-chip" data-road="A6"><span class="dot"></span> A6</div>
+    <div class="status-badge" id="statusBadge">
+      <span class="dot"></span>
+      <span id="statusText">Lädt…</span>
     </div>
   </header>
 
@@ -27,14 +26,14 @@
       </button>
       <label class="toggle">
         <input type="checkbox" id="allDirectionsToggle" />
-        auch andere Fahrtrichtungen anzeigen
+        auch Gegenrichtung der Kern-Autobahnen anzeigen
       </label>
       <span class="last-updated" id="lastUpdated">Noch nicht geladen</span>
     </section>
 
     <section id="alertSection" aria-live="polite">
       <div id="noClosures" class="banner banner-ok" hidden>
-        ✅ Aktuell keine gemeldete Vollsperrung auf A3, A9 oder A6 Richtung Nürnberg.
+        ✅ Aktuell keine gemeldete Vollsperrung auf dem Weg nach Nürnberg.
       </div>
       <div id="closureList" class="closure-list"></div>
     </section>
@@ -50,18 +49,18 @@
     </section>
 
     <section class="other-section">
-      <h2>Weitere Meldungen (Baustellen, Sperrungen von Ein-/Ausfahrten, Warnungen)</h2>
+      <h2>Weitere Meldungen nach Autobahn (Baustellen, Sperrungen von Ein-/Ausfahrten, Warnungen)</h2>
       <div id="otherList" class="other-list"></div>
     </section>
 
     <section class="map-section">
       <h2>Live-Verkehrslage (Google Maps)</h2>
       <p class="map-note">
-        Zeigt die farbliche Stauintensität von Google Maps rund um Nürnberg
-        (A3 / A9 / A6) — die einzige kostenlos verfügbare Live-Stauansicht,
-        da die offizielle Autobahn-API keine strukturierten Stau-Längen
-        liefert. Keine anklickbaren Sperrungs-/Unfall-Details — dafür gilt
-        weiterhin die Vollsperrungs-Liste oben als verlässliche Quelle.
+        Zeigt die farbliche Stauintensität von Google Maps rund um das Ziel
+        in Nürnberg — die einzige kostenlos verfügbare Live-Stauansicht, da
+        die offizielle Autobahn-API keine strukturierten Stau-Längen liefert.
+        Keine anklickbaren Sperrungs-/Unfall-Details — dafür gilt weiterhin
+        die Vollsperrungs-Liste oben als verlässliche Quelle.
       </p>
       <div id="trafficMap" class="traffic-map"></div>
     </section>

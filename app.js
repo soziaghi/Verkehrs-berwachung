@@ -1,4 +1,9 @@
-const ROADS = ["A3", "A9", "A6"];
+// Kern-Autobahnen: führen direkt auf Nürnberg zu, "Richtung Nürnberg"-Textfilter bleibt aktiv.
+const CORE_ROADS = ["A3", "A6", "A9", "A73", "A93"];
+// Zubringer-Autobahnen: liegen zu weit von Nürnberg entfernt für einen Richtungs-Textfilter,
+// daher werden hier beide Richtungen angezeigt.
+const FEEDER_ROADS = ["A1", "A2", "A4", "A5", "A7", "A8", "A13", "A71", "A81", "A92", "A95", "A99", "A113"];
+const ROADS = [...CORE_ROADS, ...FEEDER_ROADS];
 const SERVICES = ["roadworks", "closure", "warning"];
 const API_BASE = "https://verkehr.autobahn.de/o/autobahn";
 const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
@@ -14,7 +19,8 @@ const otherList = document.getElementById("otherList");
 const noClosures = document.getElementById("noClosures");
 const errorBanner = document.getElementById("errorBanner");
 const allDirectionsToggle = document.getElementById("allDirectionsToggle");
-const roadStatus = document.getElementById("roadStatus");
+const statusBadge = document.getElementById("statusBadge");
+const statusText = document.getElementById("statusText");
 
 let refreshTimer = null;
 let lastItems = [];
@@ -81,14 +87,18 @@ function setLoading(loading) {
 
 function render(items, failures) {
   const showAllDirections = allDirectionsToggle.checked;
-  const relevant = showAllDirections ? items : items.filter(isDirectionNuernberg);
+  const relevant = items.filter((item) => {
+    if (showAllDirections) return true;
+    if (CORE_ROADS.includes(item.road)) return isDirectionNuernberg(item);
+    return true;
+  });
 
   const closures = relevant.filter(isVollsperrung);
   const remaining = relevant.filter((item) => !isVollsperrung(item));
   const stauWarnungen = remaining.filter(isStauWarnung);
   const others = remaining.filter((item) => !isStauWarnung(item));
 
-  renderRoadStatus(closures, failures);
+  renderStatusBadge(closures, failures);
   renderClosures(closures);
   renderStauWarnungen(stauWarnungen);
   renderOthers(others);
@@ -99,16 +109,18 @@ function render(items, failures) {
   }
 }
 
-function renderRoadStatus(closures, failures) {
-  ROADS.forEach((road) => {
-    const chip = roadStatus.querySelector(`[data-road="${road}"]`);
-    chip.classList.remove("ok", "alert", "error");
-    const hasFailure = failures.some((f) => f.startsWith(road));
-    const hasClosure = closures.some((c) => c.road === road);
-    if (hasFailure) chip.classList.add("error");
-    else if (hasClosure) chip.classList.add("alert");
-    else chip.classList.add("ok");
-  });
+function renderStatusBadge(closures, failures) {
+  statusBadge.classList.remove("ok", "alert", "error");
+  if (failures.length) {
+    statusBadge.classList.add("error");
+    statusText.textContent = `${failures.length} von ${ROADS.length} Autobahnen nicht ladbar`;
+  } else if (closures.length) {
+    statusBadge.classList.add("alert");
+    statusText.textContent = `${closures.length} Vollsperrung${closures.length > 1 ? "en" : ""} aktiv`;
+  } else {
+    statusBadge.classList.add("ok");
+    statusText.textContent = `Keine Vollsperrung (${ROADS.length} Autobahnen überwacht)`;
+  }
 }
 
 function renderClosures(closures) {
@@ -148,7 +160,9 @@ function renderOthers(others) {
     summary.textContent = `${road} `;
     const count = document.createElement("span");
     count.className = "count";
-    count.textContent = `(${roadItems.length})`;
+    count.textContent = FEEDER_ROADS.includes(road)
+      ? `(${roadItems.length} · beide Richtungen)`
+      : `(${roadItems.length})`;
     summary.appendChild(count);
     details.appendChild(summary);
 
