@@ -282,8 +282,22 @@ body {
   font-weight: 400;
 }
 
+.land-subheader {
+  padding: 0.4rem 0.65rem 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  border-top: 1px solid var(--panel-border);
+}
+
 .row {
   border-top: 1px solid var(--panel-border);
+}
+
+.land-subheader + .row {
+  border-top: none;
 }
 
 .row-toggle {

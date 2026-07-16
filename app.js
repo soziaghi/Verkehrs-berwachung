@@ -220,31 +220,42 @@ function renderOthers(others) {
     return;
   }
 
-  const byLand = new Map();
-  others.forEach((item) => {
-    const land = classifyBundesland(item);
-    if (!byLand.has(land)) byLand.set(land, []);
-    byLand.get(land).push(item);
-  });
-
-  BUNDESLAND_ORDER.forEach((land) => {
-    const landItems = byLand.get(land);
-    if (!landItems || !landItems.length) return;
+  ROADS.forEach((road) => {
+    const roadItems = others.filter((item) => item.road === road);
+    if (!roadItems.length) return;
 
     const details = document.createElement("details");
     details.className = "road-group";
 
     const summary = document.createElement("summary");
-    summary.textContent = `${land} `;
+    summary.textContent = `${road} `;
     const count = document.createElement("span");
     count.className = "count";
-    count.textContent = `(${landItems.length})`;
+    count.textContent = FEEDER_ROADS.includes(road)
+      ? `(${roadItems.length} · beide Richtungen)`
+      : `(${roadItems.length})`;
     summary.appendChild(count);
     details.appendChild(summary);
 
-    landItems
-      .sort((a, b) => a.road.localeCompare(b.road))
-      .forEach((item) => details.appendChild(buildRow(item)));
+    const byLand = new Map();
+    roadItems.forEach((item) => {
+      const land = classifyBundesland(item);
+      if (!byLand.has(land)) byLand.set(land, []);
+      byLand.get(land).push(item);
+    });
+
+    BUNDESLAND_ORDER.forEach((land) => {
+      const landItems = byLand.get(land);
+      if (!landItems || !landItems.length) return;
+
+      const subheader = document.createElement("div");
+      subheader.className = "land-subheader";
+      subheader.textContent = land;
+      details.appendChild(subheader);
+
+      landItems.forEach((item) => details.appendChild(buildRow(item)));
+    });
+
     otherList.appendChild(details);
   });
 }
@@ -256,14 +267,6 @@ function buildRow(item) {
   const toggle = document.createElement("button");
   toggle.className = "row-toggle";
   toggle.type = "button";
-
-  const roadBadge = document.createElement("span");
-  roadBadge.className = "road-badge";
-  roadBadge.textContent = item.road;
-  roadBadge.title = FEEDER_ROADS.includes(item.road)
-    ? "Zubringer-Autobahn — beide Richtungen"
-    : "Kern-Autobahn — Richtung Nürnberg";
-  toggle.appendChild(roadBadge);
 
   const title = document.createElement("span");
   title.className = "row-title";
