@@ -74,6 +74,16 @@ erlaubt — es ist kein eigener Backend-Proxy nötig.
   ebenfalls frei in der Größe veränderbares Popup-Fenster ohne die
   Always-on-Top-Eigenschaft. Die Mini-Ansicht aktualisiert sich automatisch
   bei jedem Refresh der Hauptseite.
+  - Solange mindestens eine Vollsperrung aktiv und noch nicht bestätigt ist,
+    blinkt das Mini-Fenster rot (Hintergrund wechselt sekündlich), und eine
+    Leiste „Neue Vollsperrung!“ mit Button „✓ Gesehen“ erscheint. Das
+    Blinken hört erst nach Klick auf „Gesehen“ auf — nicht von selbst. Ein
+    Zahnradsymbol (⚙️) oben rechts im Mini-Fenster schaltet dieses Blinken
+    komplett an/aus; die Einstellung wird in `localStorage`
+    (`miniBlinkEnabled`) gespeichert und bleibt über Neuöffnen der
+    Mini-Ansicht hinweg erhalten. Taucht später eine andere/neue
+    Vollsperrung auf, blinkt es erneut, auch wenn eine frühere bereits
+    bestätigt wurde.
 
 ## Hinweis
 

@@ -1,6 +1,15 @@
 let miniWindow = null;
 let lastMiniClosures = [];
 let lastMiniStau = [];
+let acknowledgedKey = "";
+
+let blinkEnabled = true;
+try {
+  const stored = localStorage.getItem("miniBlinkEnabled");
+  if (stored !== null) blinkEnabled = stored === "true";
+} catch (err) {
+  // localStorage kann in manchen Kontexten (z. B. privates Fenster) fehlschlagen.
+}
 
 const MINI_STYLES = `
   :root { color-scheme: light dark; }
@@ -8,14 +17,26 @@ const MINI_STYLES = `
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: #171a21;
+    --mini-bg: #171a21;
+    background: var(--mini-bg);
     color: #e8eaed;
     font-size: 0.78rem;
   }
   @media (prefers-color-scheme: light) {
-    body { background: #ffffff; color: #1a1d23; }
+    body { --mini-bg: #ffffff; color: #1a1d23; }
+  }
+  @keyframes mini-blink {
+    0%, 49% { background-color: #e5484d; }
+    50%, 100% { background-color: var(--mini-bg); }
+  }
+  body.mini-blinking {
+    animation: mini-blink 1s steps(1, end) infinite;
   }
   .mini-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
     padding: 0.5rem 0.6rem;
     font-weight: 700;
     font-size: 0.85rem;
@@ -23,6 +44,44 @@ const MINI_STYLES = `
     position: sticky;
     top: 0;
     background: inherit;
+  }
+  .mini-gear {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    opacity: 0.4;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    line-height: 1;
+  }
+  .mini-gear:hover { background: rgba(127,127,127,0.18); }
+  .mini-gear.active { opacity: 1; }
+  .mini-ack-bar {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 0.6rem;
+    background: #2a0d0f;
+    color: #ffb4b6;
+    font-weight: 700;
+    border-bottom: 2px solid #e5484d;
+  }
+  @media (prefers-color-scheme: light) {
+    .mini-ack-bar { background: #fdecec; color: #a4232a; }
+  }
+  body.mini-blinking .mini-ack-bar { display: flex; }
+  .mini-ack-btn {
+    background: #e5484d;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.75rem;
+    flex-shrink: 0;
   }
   .mini-empty {
     padding: 0.6rem;
@@ -49,6 +108,19 @@ const MINI_STYLES = `
   .mini-subtitle { color: #9aa0aa; font-size: 0.72rem; display: block; margin-top: 0.1rem; }
 `;
 
+function closureKey(closures) {
+  return closures
+    .map((c) => c.identifier || `${c.road}|${c.title}`)
+    .sort()
+    .join("~");
+}
+
+function gearTitle() {
+  return blinkEnabled
+    ? "Blinken bei Vollsperrung: an (klicken zum Ausschalten)"
+    : "Blinken bei Vollsperrung: aus (klicken zum Einschalten)";
+}
+
 function buildMiniDocument(doc) {
   doc.title = "Autobahn-Überwachung · Mini";
   const style = doc.createElement("style");
@@ -57,8 +129,49 @@ function buildMiniDocument(doc) {
 
   const header = doc.createElement("div");
   header.className = "mini-header";
-  header.textContent = "🚧 Vollsperrungen & Staus";
+
+  const titleEl = doc.createElement("span");
+  titleEl.textContent = "🚧 Vollsperrungen & Staus";
+  header.appendChild(titleEl);
+
+  const gear = doc.createElement("button");
+  gear.type = "button";
+  gear.className = `mini-gear${blinkEnabled ? " active" : ""}`;
+  gear.textContent = "⚙️";
+  gear.title = gearTitle();
+  gear.addEventListener("click", () => {
+    blinkEnabled = !blinkEnabled;
+    try {
+      localStorage.setItem("miniBlinkEnabled", String(blinkEnabled));
+    } catch (err) {
+      // ignore
+    }
+    gear.classList.toggle("active", blinkEnabled);
+    gear.title = gearTitle();
+    updateAlertState();
+  });
+  header.appendChild(gear);
+
   doc.body.appendChild(header);
+
+  const ackBar = doc.createElement("div");
+  ackBar.className = "mini-ack-bar";
+
+  const ackText = doc.createElement("span");
+  ackText.textContent = "Neue Vollsperrung!";
+  ackBar.appendChild(ackText);
+
+  const ackBtn = doc.createElement("button");
+  ackBtn.type = "button";
+  ackBtn.className = "mini-ack-btn";
+  ackBtn.textContent = "✓ Gesehen";
+  ackBtn.addEventListener("click", () => {
+    acknowledgedKey = closureKey(lastMiniClosures);
+    updateAlertState();
+  });
+  ackBar.appendChild(ackBtn);
+
+  doc.body.appendChild(ackBar);
 
   const list = doc.createElement("div");
   list.id = "miniList";
@@ -89,6 +202,15 @@ function renderMiniItem(doc, item, variant) {
   return el;
 }
 
+function updateAlertState() {
+  if (!miniWindow || miniWindow.closed) return;
+  const doc = miniWindow.document;
+  const key = closureKey(lastMiniClosures);
+  const hasClosures = lastMiniClosures.length > 0;
+  const shouldBlink = blinkEnabled && hasClosures && key !== acknowledgedKey;
+  doc.body.classList.toggle("mini-blinking", shouldBlink);
+}
+
 function updateMiniView(closures, stauWarnungen) {
   lastMiniClosures = closures || [];
   lastMiniStau = stauWarnungen || [];
@@ -104,11 +226,12 @@ function updateMiniView(closures, stauWarnungen) {
     empty.className = "mini-empty";
     empty.textContent = "Keine Vollsperrung oder Stauwarnung.";
     list.appendChild(empty);
-    return;
+  } else {
+    lastMiniClosures.forEach((item) => list.appendChild(renderMiniItem(doc, item, "closure")));
+    lastMiniStau.forEach((item) => list.appendChild(renderMiniItem(doc, item, "stau")));
   }
 
-  lastMiniClosures.forEach((item) => list.appendChild(renderMiniItem(doc, item, "closure")));
-  lastMiniStau.forEach((item) => list.appendChild(renderMiniItem(doc, item, "stau")));
+  updateAlertState();
 }
 
 async function openMiniView() {
