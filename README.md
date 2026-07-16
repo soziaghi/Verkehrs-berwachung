@@ -65,6 +65,15 @@ erlaubt — es ist kein eigener Backend-Proxy nötig.
   HTTP-Referrer-Restriktion in der Google Cloud Console auf die
   ausgelieferte Domain beschränkt. Google liefert darüber keine anklickbaren
   Sperrungs-/Unfall-Details — nur die Farbeinfärbung.
+- Der Button „📌 Mini-Ansicht“ links neben „Aktualisieren“ öffnet ein
+  kompaktes, frei skalierbares Fenster mit nur den Vollsperrungen und
+  Stauwarnungen (`mini-view.js`). In Chrome/Edge nutzt das die
+  **Document Picture-in-Picture API**, wodurch das Fenster immer im
+  Vordergrund bleibt — auch über anderen Fenstern/Apps. In Browsern ohne
+  diese API (z. B. Firefox/Safari) öffnet sich stattdessen ein normales,
+  ebenfalls frei in der Größe veränderbares Popup-Fenster ohne die
+  Always-on-Top-Eigenschaft. Die Mini-Ansicht aktualisiert sich automatisch
+  bei jedem Refresh der Hauptseite.
 
 ## Hinweis
 

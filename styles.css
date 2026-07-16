@@ -115,6 +115,24 @@ body {
   cursor: not-allowed;
 }
 
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  color: var(--text);
+  border: 1px solid var(--panel-border);
+  padding: 0.34rem 0.7rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+
+.btn-secondary:hover {
+  background: var(--stripe);
+}
+
 .toggle {
   display: flex;
   align-items: center;

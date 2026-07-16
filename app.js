@@ -173,6 +173,7 @@ function render(items, failures) {
   renderClosures(closures);
   renderStauWarnungen(stauWarnungen);
   renderOthers(others);
+  if (typeof updateMiniView === "function") updateMiniView(closures, stauWarnungen);
 
   if (failures.length) {
     errorBanner.hidden = false;
