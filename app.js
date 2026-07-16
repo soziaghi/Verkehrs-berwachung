@@ -118,9 +118,62 @@ function renderOthers(others) {
     otherList.appendChild(p);
     return;
   }
-  others
-    .sort((a, b) => a.road.localeCompare(b.road))
-    .forEach((item) => otherList.appendChild(buildCard(item, false)));
+
+  ROADS.forEach((road) => {
+    const roadItems = others.filter((item) => item.road === road);
+    if (!roadItems.length) return;
+
+    const details = document.createElement("details");
+    details.className = "road-group";
+
+    const summary = document.createElement("summary");
+    summary.textContent = `${road} `;
+    const count = document.createElement("span");
+    count.className = "count";
+    count.textContent = `(${roadItems.length})`;
+    summary.appendChild(count);
+    details.appendChild(summary);
+
+    roadItems.forEach((item) => details.appendChild(buildRow(item)));
+    otherList.appendChild(details);
+  });
+}
+
+function buildRow(item) {
+  const row = document.createElement("div");
+  row.className = "row";
+
+  const toggle = document.createElement("button");
+  toggle.className = "row-toggle";
+  toggle.type = "button";
+
+  const title = document.createElement("span");
+  title.className = "row-title";
+  title.textContent = item.title || "(ohne Titel)";
+  toggle.appendChild(title);
+
+  if (item.subtitle) {
+    const subtitle = document.createElement("span");
+    subtitle.className = "row-subtitle";
+    subtitle.textContent = item.subtitle.trim();
+    toggle.appendChild(subtitle);
+  }
+
+  row.appendChild(toggle);
+
+  if (item.description && item.description.length) {
+    const desc = document.createElement("div");
+    desc.className = "row-desc";
+    desc.textContent = item.description.filter(Boolean).join("\n");
+    desc.hidden = true;
+    row.appendChild(desc);
+
+    toggle.addEventListener("click", () => {
+      desc.hidden = !desc.hidden;
+    });
+  }
+
+  return row;
 }
 
 function buildCard(item, isClosure) {
@@ -150,16 +203,17 @@ function buildCard(item, isClosure) {
 
   if (item.description && item.description.length) {
     const desc = document.createElement("div");
-    desc.className = "card-desc collapsed";
+    desc.className = "card-desc";
     desc.textContent = item.description.filter(Boolean).join("\n");
+    desc.hidden = true;
     card.appendChild(desc);
 
     const toggleBtn = document.createElement("button");
     toggleBtn.className = "toggle-desc";
     toggleBtn.textContent = "Details anzeigen";
     toggleBtn.addEventListener("click", () => {
-      const collapsed = desc.classList.toggle("collapsed");
-      toggleBtn.textContent = collapsed ? "Details anzeigen" : "Details ausblenden";
+      desc.hidden = !desc.hidden;
+      toggleBtn.textContent = desc.hidden ? "Details anzeigen" : "Details ausblenden";
     });
     card.appendChild(toggleBtn);
   }
