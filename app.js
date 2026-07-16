@@ -8,6 +8,8 @@ const refreshLabel = document.getElementById("refreshLabel");
 const spinner = document.getElementById("spinner");
 const lastUpdated = document.getElementById("lastUpdated");
 const closureList = document.getElementById("closureList");
+const stauList = document.getElementById("stauList");
+const noStau = document.getElementById("noStau");
 const otherList = document.getElementById("otherList");
 const noClosures = document.getElementById("noClosures");
 const errorBanner = document.getElementById("errorBanner");
@@ -35,6 +37,11 @@ function isVollsperrung(item) {
   if (/(komplett|voll(ständig)?) gesperrt/.test(fullText)) return true;
   if (/in beide richtungen gesperrt/.test(fullText)) return true;
   return false;
+}
+
+function isStauWarnung(item) {
+  const fullText = `${item.title || ""} ${item.subtitle || ""} ${(item.description || []).join(" ")}`.toLowerCase();
+  return /\bstau\b|staugefahr|stockender verkehr|zähfließend|zaehfliessend|verkehr staut/.test(fullText);
 }
 
 async function fetchRoadService(road, service) {
@@ -77,10 +84,13 @@ function render(items, failures) {
   const relevant = showAllDirections ? items : items.filter(isDirectionNuernberg);
 
   const closures = relevant.filter(isVollsperrung);
-  const others = relevant.filter((item) => !isVollsperrung(item));
+  const remaining = relevant.filter((item) => !isVollsperrung(item));
+  const stauWarnungen = remaining.filter(isStauWarnung);
+  const others = remaining.filter((item) => !isStauWarnung(item));
 
   renderRoadStatus(closures, failures);
   renderClosures(closures);
+  renderStauWarnungen(stauWarnungen);
   renderOthers(others);
 
   if (failures.length) {
@@ -106,7 +116,15 @@ function renderClosures(closures) {
   noClosures.hidden = closures.length > 0;
   closures
     .sort((a, b) => a.road.localeCompare(b.road))
-    .forEach((item) => closureList.appendChild(buildCard(item, true)));
+    .forEach((item) => closureList.appendChild(buildCard(item, "closure")));
+}
+
+function renderStauWarnungen(stauWarnungen) {
+  stauList.innerHTML = "";
+  noStau.hidden = stauWarnungen.length > 0;
+  stauWarnungen
+    .sort((a, b) => a.road.localeCompare(b.road))
+    .forEach((item) => stauList.appendChild(buildCard(item, "stau")));
 }
 
 function renderOthers(others) {
@@ -176,9 +194,9 @@ function buildRow(item) {
   return row;
 }
 
-function buildCard(item, isClosure) {
+function buildCard(item, variant) {
   const card = document.createElement("div");
-  card.className = `card${isClosure ? " closure" : ""}`;
+  card.className = `card${variant ? ` ${variant}` : ""}`;
 
   const top = document.createElement("div");
   top.className = "card-top";

@@ -41,6 +41,14 @@
 
     <section id="errorBanner" class="banner banner-error" hidden></section>
 
+    <section class="stau-section" aria-live="polite">
+      <h2>Stauwarnungen</h2>
+      <div id="noStau" class="banner banner-ok" hidden>
+        ✅ Aktuell keine Stauwarnung in den offiziellen Meldungen.
+      </div>
+      <div id="stauList" class="closure-list"></div>
+    </section>
+
     <section class="other-section">
       <h2>Weitere Meldungen (Baustellen, Sperrungen von Ein-/Ausfahrten, Warnungen)</h2>
       <div id="otherList" class="other-list"></div>
@@ -49,10 +57,11 @@
     <section class="map-section">
       <h2>Live-Verkehrslage (Google Maps)</h2>
       <p class="map-note">
-        Zeigt nur die farbliche Stauintensität von Google Maps rund um Nürnberg
-        (A3 / A9 / A6). Google liefert über die öffentliche API keine
-        anklickbaren Sperrungs-/Unfall-Details — dafür gilt weiterhin die
-        Vollsperrungs-Liste oben als verlässliche Quelle.
+        Zeigt die farbliche Stauintensität von Google Maps rund um Nürnberg
+        (A3 / A9 / A6) — die einzige kostenlos verfügbare Live-Stauansicht,
+        da die offizielle Autobahn-API keine strukturierten Stau-Längen
+        liefert. Keine anklickbaren Sperrungs-/Unfall-Details — dafür gilt
+        weiterhin die Vollsperrungs-Liste oben als verlässliche Quelle.
       </p>
       <div id="trafficMap" class="traffic-map"></div>
     </section>

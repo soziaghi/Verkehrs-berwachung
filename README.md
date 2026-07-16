@@ -31,11 +31,18 @@ erlaubt — es ist kein eigener Backend-Proxy nötig.
   Ein-/Ausfahrten, Warnungen) erscheinen darunter zur Einordnung.
 - Automatische Aktualisierung alle 5 Minuten, zusätzlich manueller
   „Aktualisieren“-Button.
+- Einträge mit Begriffen wie „Stau“, „Staugefahr“ oder „zähfließender
+  Verkehr“ landen zusätzlich in einer eigenen, orange hervorgehobenen
+  Sektion „Stauwarnungen“ zwischen den Vollsperrungen und den übrigen
+  Meldungen. Die offizielle API liefert keine strukturierte Stau-Länge/
+  -Dauer — das ist reine Texterkennung auf denselben Baustellen-/Warnungs-
+  Daten.
 - Zusätzlich zeigt eine eingebettete Google-Maps-Karte (`traffic-map.js`) die
-  Stauintensität (Farb-Layer) rund um Nürnberg. Der API-Key liegt in
-  `config.js` und ist per HTTP-Referrer-Restriktion in der Google Cloud
-  Console auf die ausgelieferte Domain beschränkt. Google liefert darüber
-  keine anklickbaren Sperrungs-/Unfall-Details — nur die Farbeinfärbung.
+  Stauintensität (Farb-Layer) rund um Nürnberg — die einzige kostenlos
+  verfügbare Live-Stauansicht. Der API-Key liegt in `config.js` und ist per
+  HTTP-Referrer-Restriktion in der Google Cloud Console auf die
+  ausgelieferte Domain beschränkt. Google liefert darüber keine anklickbaren
+  Sperrungs-/Unfall-Details — nur die Farbeinfärbung.
 
 ## Hinweis
 
