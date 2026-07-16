@@ -38,13 +38,14 @@ erlaubt — es ist kein eigener Backend-Proxy nötig.
     ursprünglichen Streckenprüfung dokumentiert (mit dem Nutzer abgestimmt).
 - Die Sektion „Weitere Meldungen“ gruppiert wie ursprünglich nach
   **Autobahn** (aufklappbar). Innerhalb jeder aufgeklappten Autobahn sind
-  die Meldungen zusätzlich nach **Bundesland** sortiert — beginnend mit
-  Bayern (enthält das Ziel), danach aufsteigend nach Luftlinien-Entfernung
-  der übrigen 15 Bundesländer von Nürnberg. Die Zuordnung erfolgt über den
-  nächstgelegenen Bundesland-Zentroid zur Meldungs-Koordinate
-  (`classifyBundesland` in `app.js`) — eine Näherung ohne echte
-  Grenzpolygone, da die App bewusst ohne zusätzliche Geodaten/APIs
-  auskommt.
+  die Meldungen zusätzlich nach **Bundesland** gruppiert — ebenfalls als
+  eigene aufklappbare Gruppe mit Pfeil, die erst per Klick ihre Einträge
+  zeigt. Reihenfolge: beginnend mit Bayern (enthält das Ziel), danach
+  aufsteigend nach Luftlinien-Entfernung der übrigen 15 Bundesländer von
+  Nürnberg. Die Zuordnung erfolgt über den nächstgelegenen
+  Bundesland-Zentroid zur Meldungs-Koordinate (`classifyBundesland` in
+  `app.js`) — eine Näherung ohne echte Grenzpolygone, da die App bewusst
+  ohne zusätzliche Geodaten/APIs auskommt.
 - Eine Meldung gilt als **Vollsperrung**, wenn das API-Feld `isBlocked` gesetzt
   ist oder Titel/Beschreibung Begriffe wie „Vollsperrung“ / „komplett
   gesperrt“ / „in beide Richtungen gesperrt“ enthalten. Vollsperrungen werden

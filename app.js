@@ -248,12 +248,19 @@ function renderOthers(others) {
       const landItems = byLand.get(land);
       if (!landItems || !landItems.length) return;
 
-      const subheader = document.createElement("div");
-      subheader.className = "land-subheader";
-      subheader.textContent = land;
-      details.appendChild(subheader);
+      const landDetails = document.createElement("details");
+      landDetails.className = "land-group";
 
-      landItems.forEach((item) => details.appendChild(buildRow(item)));
+      const landSummary = document.createElement("summary");
+      landSummary.textContent = `${land} `;
+      const landCount = document.createElement("span");
+      landCount.className = "count";
+      landCount.textContent = `(${landItems.length})`;
+      landSummary.appendChild(landCount);
+      landDetails.appendChild(landSummary);
+
+      landItems.forEach((item) => landDetails.appendChild(buildRow(item)));
+      details.appendChild(landDetails);
     });
 
     otherList.appendChild(details);

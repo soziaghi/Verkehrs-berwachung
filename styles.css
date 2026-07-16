@@ -282,21 +282,48 @@ body {
   font-weight: 400;
 }
 
-.land-subheader {
-  padding: 0.4rem 0.65rem 0.2rem;
+.land-group {
+  border-top: 1px solid var(--panel-border);
+}
+
+.land-group summary {
+  cursor: pointer;
+  padding: 0.35rem 0.65rem;
+  padding-left: 1.15rem;
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-dim);
-  border-top: 1px solid var(--panel-border);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.land-group summary::-webkit-details-marker { display: none; }
+
+.land-group summary::before {
+  content: "▸";
+  font-size: 0.65rem;
+  transition: transform 0.15s ease;
+}
+
+.land-group[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.land-group summary .count {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .row {
   border-top: 1px solid var(--panel-border);
 }
 
-.land-subheader + .row {
+.land-group .row:first-of-type {
   border-top: none;
 }
 
