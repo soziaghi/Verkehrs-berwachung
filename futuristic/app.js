@@ -1,8 +1,12 @@
 // Kern-Autobahnen: führen direkt auf Nürnberg zu, "Richtung Nürnberg"-Textfilter bleibt aktiv.
 const CORE_ROADS = ["A3", "A6", "A9", "A73", "A93"];
 // Zubringer-Autobahnen: liegen zu weit von Nürnberg entfernt für einen Richtungs-Textfilter,
-// daher werden hier beide Richtungen angezeigt.
-const FEEDER_ROADS = ["A1", "A2", "A4", "A5", "A7", "A8", "A13", "A71", "A81", "A92", "A95", "A99", "A113"];
+// daher werden hier beide Richtungen angezeigt. Die letzten 13 (A10 … A72) kamen über die
+// Center/Tour-Standortauswertung (routenbasiert per OSRM) als zusätzlich relevant hinzu.
+const FEEDER_ROADS = [
+  "A1", "A2", "A4", "A5", "A7", "A8", "A13", "A71", "A81", "A92", "A95", "A99", "A113",
+  "A10", "A27", "A33", "A44", "A45", "A46", "A485", "A60", "A66", "A661", "A67", "A70", "A72",
+];
 const ROADS = [...CORE_ROADS, ...FEEDER_ROADS];
 const SERVICES = ["roadworks", "closure", "warning"];
 const API_BASE = "https://verkehr.autobahn.de/o/autobahn";
@@ -29,12 +33,77 @@ const hiddenView = document.getElementById("hiddenView");
 const hiddenList = document.getElementById("hiddenList");
 const noHidden = document.getElementById("noHidden");
 const roadStatusGrid = document.getElementById("roadStatusGrid");
+const centerFilter = document.getElementById("centerFilter");
+const tourFilter = document.getElementById("tourFilter");
+const resetFilterBtn = document.getElementById("resetFilterBtn");
+const filterInfo = document.getElementById("filterInfo");
 
 let refreshTimer = null;
 let lastItems = [];
 let activeTab = "main";
+let selectedCenter = "";
+let selectedTour = "";
 
 const roadStatusTiles = new Map();
+
+function buildOption(value, label) {
+  const opt = document.createElement("option");
+  opt.value = value;
+  opt.textContent = label;
+  return opt;
+}
+
+function populateCenterOptions() {
+  centerFilter.innerHTML = "";
+  centerFilter.appendChild(buildOption("", "Alle Center"));
+  const centers = [...new Set(STANDORTE.map((s) => s.center))].sort((a, b) =>
+    a.localeCompare(b, "de")
+  );
+  centers.forEach((c) => centerFilter.appendChild(buildOption(c, c)));
+}
+
+function populateTourOptions() {
+  tourFilter.innerHTML = "";
+  tourFilter.appendChild(buildOption("", "Alle Touren"));
+  const relevant = selectedCenter
+    ? STANDORTE.filter((s) => s.center === selectedCenter)
+    : STANDORTE;
+  const tours = [...new Set(relevant.flatMap((s) => s.tours))].sort((a, b) =>
+    a.localeCompare(b, "de")
+  );
+  tours.forEach((t) => tourFilter.appendChild(buildOption(t, t)));
+  if (!tours.includes(selectedTour)) selectedTour = "";
+  tourFilter.value = selectedTour;
+}
+
+function currentAllowedRoads() {
+  if (!selectedCenter && !selectedTour) return null;
+  const matches = STANDORTE.filter((s) => {
+    if (selectedCenter && s.center !== selectedCenter) return false;
+    if (selectedTour && !s.tours.includes(selectedTour)) return false;
+    return true;
+  });
+  const roads = new Set();
+  matches.forEach((s) => s.roads.forEach((r) => roads.add(r)));
+  return roads;
+}
+
+function updateFilterInfo() {
+  const allowed = currentAllowedRoads();
+  if (!allowed) {
+    filterInfo.hidden = true;
+    filterInfo.textContent = "";
+    return;
+  }
+  filterInfo.hidden = false;
+  const list = ROADS.filter((r) => allowed.has(r));
+  filterInfo.textContent = list.length
+    ? `Gefiltert auf: ${list.join(", ")}`
+    : "Keine Autobahnen für diese Auswahl gefunden.";
+}
+
+populateCenterOptions();
+populateTourOptions();
 
 function buildRoadStatusGrid() {
   ROADS.forEach((road) => {
@@ -228,10 +297,15 @@ function render(items, failures) {
     return true;
   });
 
-  renderRoadStatus(relevant, failures);
+  const allowedRoads = currentAllowedRoads();
+  const scoped = allowedRoads
+    ? relevant.filter((item) => allowedRoads.has(item.road))
+    : relevant;
 
-  const visible = relevant.filter((item) => !hiddenKeys.has(itemKey(item)));
-  const hidden = relevant.filter((item) => hiddenKeys.has(itemKey(item)));
+  renderRoadStatus(scoped, failures, allowedRoads);
+
+  const visible = scoped.filter((item) => !hiddenKeys.has(itemKey(item)));
+  const hidden = scoped.filter((item) => hiddenKeys.has(itemKey(item)));
 
   const closures = visible.filter(isVollsperrung);
   const remaining = visible.filter((item) => !isVollsperrung(item));
@@ -273,7 +347,7 @@ function updateTabUI() {
   tabHiddenBtn.classList.toggle("active", activeTab === "hidden");
 }
 
-function renderRoadStatus(relevantItems, failures) {
+function renderRoadStatus(relevantItems, failures, allowedRoads) {
   const failedRoads = new Set(
     failures.map((msg) => (msg || "").split("/")[0].trim()).filter(Boolean)
   );
@@ -281,6 +355,12 @@ function renderRoadStatus(relevantItems, failures) {
   ROADS.forEach((road) => {
     const tile = roadStatusTiles.get(road);
     if (!tile) return;
+
+    if (allowedRoads && !allowedRoads.has(road)) {
+      tile.hidden = true;
+      return;
+    }
+    tile.hidden = false;
 
     const roadItems = relevantItems.filter((item) => item.road === road);
     const closureCount = roadItems.filter(isVollsperrung).length;
@@ -509,6 +589,25 @@ tabMainBtn.addEventListener("click", () => {
 tabHiddenBtn.addEventListener("click", () => {
   activeTab = "hidden";
   updateTabUI();
+});
+centerFilter.addEventListener("change", () => {
+  selectedCenter = centerFilter.value;
+  populateTourOptions();
+  updateFilterInfo();
+  render(lastItems, []);
+});
+tourFilter.addEventListener("change", () => {
+  selectedTour = tourFilter.value;
+  updateFilterInfo();
+  render(lastItems, []);
+});
+resetFilterBtn.addEventListener("click", () => {
+  selectedCenter = "";
+  selectedTour = "";
+  centerFilter.value = "";
+  populateTourOptions();
+  updateFilterInfo();
+  render(lastItems, []);
 });
 
 function showFatalError(err) {
