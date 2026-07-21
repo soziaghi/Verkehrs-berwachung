@@ -12,7 +12,7 @@ try {
 }
 
 const MINI_STYLES = `
-  :root { color-scheme: light dark; }
+  :root { color-scheme: dark; }
   * { box-sizing: border-box; }
   body {
     margin: 0;
@@ -21,9 +21,6 @@ const MINI_STYLES = `
     background: var(--mini-bg);
     color: #e6f7ff;
     font-size: 0.78rem;
-  }
-  @media (prefers-color-scheme: light) {
-    body { --mini-bg: #eef2fb; color: #0b1226; }
   }
   @keyframes mini-blink {
     0%, 49% { background-color: #ff3b5c; }
@@ -68,9 +65,6 @@ const MINI_STYLES = `
     color: #ffb4c4;
     font-weight: 700;
     border-bottom: 2px solid #ff3b5c;
-  }
-  @media (prefers-color-scheme: light) {
-    .mini-ack-bar { background: #ffe1e7; color: #a4232a; }
   }
   body.mini-blinking .mini-ack-bar { display: flex; }
   .mini-ack-btn {
