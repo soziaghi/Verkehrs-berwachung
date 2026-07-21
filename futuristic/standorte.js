@@ -46,4 +46,5 @@ const STANDORTE = [
   { center: "WIBDE", ort: "Wiesbaden", tours: ["WI11"], adresse: "Am Kupferwerk 26 65462 Ginsheim-Gustavsburg", roads: ["A60", "A67", "A3", "A73"] },
   { center: "WLFDE", ort: "Wolfratshausen", tours: ["WF01", "WF03", "N901"], adresse: "Hans-Urmiller-Ring 13 82515 Wolfratshausen", roads: ["A95", "A9", "A73"] },
   { center: "WUEDE", ort: "Würzburg", tours: ["WU03", "WU54"], adresse: "Alte Landstraße 2 97218 Gerbrunn", roads: ["A3", "A73"] },
+  { center: "HERDE", ort: "Herne", tours: ["E903", "E908"], adresse: "Friedrich der Große 2 44628 Herne-Boernig", roads: ["A42", "A45", "A3", "A73"] },
 ];
