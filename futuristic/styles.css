@@ -1,4 +1,5 @@
 :root {
+  color-scheme: dark;
   --bg: #05070d;
   --bg-deep: #020306;
   --panel: rgba(16, 22, 38, 0.72);
@@ -15,21 +16,6 @@
   --warn: #ffb020;
   --warn-bg: rgba(255, 176, 32, 0.1);
   font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #eef2fb;
-    --bg-deep: #dfe6f7;
-    --panel: rgba(255, 255, 255, 0.75);
-    --panel-solid: #ffffff;
-    --panel-border: rgba(0, 140, 220, 0.25);
-    --text: #0b1226;
-    --text-dim: #4a5670;
-    --danger-bg: #ffe1e7;
-    --ok-bg: #dbffef;
-    --warn-bg: #fff2da;
-  }
 }
 
 * { box-sizing: border-box; }
@@ -61,14 +47,6 @@ body {
   background-size: 42px 42px;
   mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black, transparent 80%);
   pointer-events: none;
-}
-
-@media (prefers-color-scheme: light) {
-  .hud-grid {
-    background-image:
-      linear-gradient(rgba(0, 140, 220, 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 140, 220, 0.08) 1px, transparent 1px);
-  }
 }
 
 .hud-scanline {
