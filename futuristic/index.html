@@ -16,7 +16,7 @@
   <header class="app-header">
     <div class="header-inner">
       <h1><span class="glyph">⚡</span> AUTOBAHN <span class="accent-text">CONTROL</span></h1>
-      <p class="subtitle">18 AUTOBAHNEN · ZIEL-VEKTOR: KOBLENZERSTR. 13, 90451 NÜRNBERG</p>
+      <p class="subtitle">31 AUTOBAHNEN · ZIEL-VEKTOR: KOBLENZERSTR. 13, 90451 NÜRNBERG</p>
     </div>
     <div class="status-badge" id="statusBadge">
       <span class="dot"></span>
@@ -38,6 +38,19 @@
         auch Gegenrichtung der Kern-Autobahnen anzeigen
       </label>
       <span class="last-updated" id="lastUpdated">Noch nicht geladen</span>
+    </section>
+
+    <section class="filter-bar">
+      <label class="filter-field">
+        <span>Center</span>
+        <select id="centerFilter"></select>
+      </label>
+      <label class="filter-field">
+        <span>Tour</span>
+        <select id="tourFilter"></select>
+      </label>
+      <button id="resetFilterBtn" class="btn-secondary" type="button">Filter zurücksetzen</button>
+      <span id="filterInfo" class="filter-info" hidden></span>
     </section>
 
     <nav class="tab-bar">
@@ -116,6 +129,7 @@
   </footer>
 
   <script src="config.js"></script>
+  <script src="standorte.js"></script>
   <script src="app.js"></script>
   <script src="mini-view.js"></script>
   <script src="traffic-map.js"></script>

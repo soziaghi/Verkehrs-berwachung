@@ -173,6 +173,52 @@ body {
   margin-bottom: 0.9rem;
 }
 
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.7rem;
+  margin-bottom: 0.9rem;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.filter-field select {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--panel-solid);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 0.35rem 0.5rem;
+  min-width: 160px;
+  cursor: pointer;
+}
+
+.filter-field select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.35);
+}
+
+.filter-info {
+  font-size: 0.76rem;
+  color: var(--accent);
+  font-weight: 600;
+  padding-bottom: 0.45rem;
+}
+
 .tab-bar {
   display: flex;
   gap: 0.4rem;
@@ -245,6 +291,10 @@ body {
   -webkit-backdrop-filter: blur(8px);
   cursor: default;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.road-tile[hidden] {
+  display: none;
 }
 
 .road-tile-label {
