@@ -35,6 +35,7 @@ const noHidden = document.getElementById("noHidden");
 const roadStatusGrid = document.getElementById("roadStatusGrid");
 const centerFilter = document.getElementById("centerFilter");
 const tourFilter = document.getElementById("tourFilter");
+const ortFilter = document.getElementById("ortFilter");
 const resetFilterBtn = document.getElementById("resetFilterBtn");
 const filterInfo = document.getElementById("filterInfo");
 
@@ -43,6 +44,7 @@ let lastItems = [];
 let activeTab = "main";
 let selectedCenter = "";
 let selectedTour = "";
+let selectedOrt = "";
 
 const roadStatusTiles = new Map();
 
@@ -53,36 +55,45 @@ function buildOption(value, label) {
   return opt;
 }
 
-function populateCenterOptions() {
-  centerFilter.innerHTML = "";
-  centerFilter.appendChild(buildOption("", "Alle Center"));
-  const centers = [...new Set(STANDORTE.map((s) => s.center))].sort((a, b) =>
-    a.localeCompare(b, "de")
-  );
-  centers.forEach((c) => centerFilter.appendChild(buildOption(c, c)));
+// Prüft, ob ein Standort zu den aktuell gewählten Filtern passt. `exclude`
+// lässt eines der drei Kriterien aus, damit das zugehörige Dropdown seine
+// eigenen Optionen unabhängig von seiner eigenen aktuellen Auswahl berechnen
+// kann (sonst würde eine Auswahl ihre eigenen Alternativen wegfiltern).
+function matchesFilters(s, exclude) {
+  if (exclude !== "center" && selectedCenter && s.center !== selectedCenter) return false;
+  if (exclude !== "tour" && selectedTour && !s.tours.includes(selectedTour)) return false;
+  if (exclude !== "ort" && selectedOrt && s.ort !== selectedOrt) return false;
+  return true;
 }
 
-function populateTourOptions() {
-  tourFilter.innerHTML = "";
-  tourFilter.appendChild(buildOption("", "Alle Touren"));
-  const relevant = selectedCenter
-    ? STANDORTE.filter((s) => s.center === selectedCenter)
-    : STANDORTE;
-  const tours = [...new Set(relevant.flatMap((s) => s.tours))].sort((a, b) =>
+function populateSelect(selectEl, values, placeholder, current) {
+  selectEl.innerHTML = "";
+  selectEl.appendChild(buildOption("", placeholder));
+  values.forEach((v) => selectEl.appendChild(buildOption(v, v)));
+  const value = values.includes(current) ? current : "";
+  selectEl.value = value;
+  return value;
+}
+
+function refreshFilterOptions() {
+  const centers = [...new Set(STANDORTE.filter((s) => matchesFilters(s, "center")).map((s) => s.center))].sort(
+    (a, b) => a.localeCompare(b, "de")
+  );
+  const tours = [...new Set(STANDORTE.filter((s) => matchesFilters(s, "tour")).flatMap((s) => s.tours))].sort(
+    (a, b) => a.localeCompare(b, "de")
+  );
+  const orte = [...new Set(STANDORTE.filter((s) => matchesFilters(s, "ort")).map((s) => s.ort))].sort((a, b) =>
     a.localeCompare(b, "de")
   );
-  tours.forEach((t) => tourFilter.appendChild(buildOption(t, t)));
-  if (!tours.includes(selectedTour)) selectedTour = "";
-  tourFilter.value = selectedTour;
+
+  selectedCenter = populateSelect(centerFilter, centers, "Alle Center", selectedCenter);
+  selectedTour = populateSelect(tourFilter, tours, "Alle Touren", selectedTour);
+  selectedOrt = populateSelect(ortFilter, orte, "Alle Orte", selectedOrt);
 }
 
 function currentAllowedRoads() {
-  if (!selectedCenter && !selectedTour) return null;
-  const matches = STANDORTE.filter((s) => {
-    if (selectedCenter && s.center !== selectedCenter) return false;
-    if (selectedTour && !s.tours.includes(selectedTour)) return false;
-    return true;
-  });
+  if (!selectedCenter && !selectedTour && !selectedOrt) return null;
+  const matches = STANDORTE.filter((s) => matchesFilters(s, null));
   const roads = new Set();
   matches.forEach((s) => s.roads.forEach((r) => roads.add(r)));
   return roads;
@@ -102,8 +113,7 @@ function updateFilterInfo() {
     : "Keine Autobahnen für diese Auswahl gefunden.";
 }
 
-populateCenterOptions();
-populateTourOptions();
+refreshFilterOptions();
 
 function buildRoadStatusGrid() {
   ROADS.forEach((road) => {
@@ -592,20 +602,27 @@ tabHiddenBtn.addEventListener("click", () => {
 });
 centerFilter.addEventListener("change", () => {
   selectedCenter = centerFilter.value;
-  populateTourOptions();
+  refreshFilterOptions();
   updateFilterInfo();
   render(lastItems, []);
 });
 tourFilter.addEventListener("change", () => {
   selectedTour = tourFilter.value;
+  refreshFilterOptions();
+  updateFilterInfo();
+  render(lastItems, []);
+});
+ortFilter.addEventListener("change", () => {
+  selectedOrt = ortFilter.value;
+  refreshFilterOptions();
   updateFilterInfo();
   render(lastItems, []);
 });
 resetFilterBtn.addEventListener("click", () => {
   selectedCenter = "";
   selectedTour = "";
-  centerFilter.value = "";
-  populateTourOptions();
+  selectedOrt = "";
+  refreshFilterOptions();
   updateFilterInfo();
   render(lastItems, []);
 });
