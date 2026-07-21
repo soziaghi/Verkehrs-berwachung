@@ -28,10 +28,33 @@ const mainView = document.getElementById("mainView");
 const hiddenView = document.getElementById("hiddenView");
 const hiddenList = document.getElementById("hiddenList");
 const noHidden = document.getElementById("noHidden");
+const roadStatusGrid = document.getElementById("roadStatusGrid");
 
 let refreshTimer = null;
 let lastItems = [];
 let activeTab = "main";
+
+const roadStatusTiles = new Map();
+
+function buildRoadStatusGrid() {
+  ROADS.forEach((road) => {
+    const tile = document.createElement("div");
+    tile.className = "road-tile status-ok";
+
+    const label = document.createElement("span");
+    label.className = "road-tile-label";
+    label.textContent = road;
+    tile.appendChild(label);
+
+    const bar = document.createElement("span");
+    bar.className = "road-tile-bar";
+    tile.appendChild(bar);
+
+    roadStatusGrid.appendChild(tile);
+    roadStatusTiles.set(road, tile);
+  });
+}
+buildRoadStatusGrid();
 
 const HIDDEN_STORAGE_KEY = "ausgeblendeteMeldungen";
 
@@ -205,6 +228,8 @@ function render(items, failures) {
     return true;
   });
 
+  renderRoadStatus(relevant, failures);
+
   const visible = relevant.filter((item) => !hiddenKeys.has(itemKey(item)));
   const hidden = relevant.filter((item) => hiddenKeys.has(itemKey(item)));
 
@@ -246,6 +271,34 @@ function updateTabUI() {
   hiddenView.hidden = activeTab !== "hidden";
   tabMainBtn.classList.toggle("active", activeTab === "main");
   tabHiddenBtn.classList.toggle("active", activeTab === "hidden");
+}
+
+function renderRoadStatus(relevantItems, failures) {
+  const failedRoads = new Set(
+    failures.map((msg) => (msg || "").split("/")[0].trim()).filter(Boolean)
+  );
+
+  ROADS.forEach((road) => {
+    const tile = roadStatusTiles.get(road);
+    if (!tile) return;
+
+    const roadItems = relevantItems.filter((item) => item.road === road);
+    const closureCount = roadItems.filter(isVollsperrung).length;
+    const stauCount = roadItems.filter(
+      (item) => !isVollsperrung(item) && isStauWarnung(item)
+    ).length;
+
+    let status = "ok";
+    if (closureCount > 0) status = "closure";
+    else if (stauCount > 0) status = "stau";
+    else if (failedRoads.has(road)) status = "error";
+
+    tile.className = `road-tile status-${status}`;
+    tile.title =
+      status === "error"
+        ? `${road}: Daten konnten nicht geladen werden`
+        : `${road}: ${closureCount} Vollsperrung${closureCount === 1 ? "" : "en"} · ${stauCount} Stauwarnung${stauCount === 1 ? "" : "en"}`;
+  });
 }
 
 function renderStatusBadge(closures, failures) {
