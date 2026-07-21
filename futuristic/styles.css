@@ -195,6 +195,87 @@ body {
   margin-bottom: 0.9rem;
 }
 
+.tab-bar {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.tab-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-bottom: none;
+  color: var(--text-dim);
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px 8px 0 0;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transform: translateY(1px);
+  transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+
+.tab-btn:hover {
+  color: var(--text);
+}
+
+.tab-btn.active {
+  color: var(--accent);
+  background: var(--panel);
+  border-color: var(--panel-border);
+  box-shadow: 0 -2px 12px rgba(0, 229, 255, 0.15);
+}
+
+.tab-count {
+  color: var(--accent-2);
+  font-weight: 700;
+}
+
+.hide-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--text-dim);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-family: "Orbitron", sans-serif;
+}
+
+.hide-control input {
+  accent-color: var(--accent-2);
+  cursor: pointer;
+}
+
+.row-main {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-right: 0.7rem;
+}
+
+.row-main .row-toggle {
+  flex: 1;
+  min-width: 0;
+}
+
+.hidden-section h2 {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin: 0 0 0.4rem;
+  font-family: "Orbitron", sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .btn-primary {
   display: inline-flex;
   align-items: center;
