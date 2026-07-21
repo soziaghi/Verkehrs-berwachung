@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>⚡ AUTOBAHN CONTROL · Nürnberg</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="hud-grid" aria-hidden="true"></div>
+  <div class="hud-scanline" aria-hidden="true"></div>
+
+  <header class="app-header">
+    <div class="header-inner">
+      <h1><span class="glyph">⚡</span> AUTOBAHN <span class="accent-text">CONTROL</span></h1>
+      <p class="subtitle">18 AUTOBAHNEN · ZIEL-VEKTOR: KOBLENZERSTR. 13, 90451 NÜRNBERG</p>
+    </div>
+    <div class="status-badge" id="statusBadge">
+      <span class="dot"></span>
+      <span id="statusText">Lädt…</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="toolbar">
+      <button id="miniViewBtn" class="btn-secondary" title="Kompakte Übersicht in einem eigenen, immer im Vordergrund bleibenden und frei skalierbaren Fenster öffnen">
+        📌 Mini-Ansicht
+      </button>
+      <button id="refreshBtn" class="btn-primary">
+        <span class="spinner" id="spinner" hidden></span>
+        <span id="refreshLabel">Aktualisieren</span>
+      </button>
+      <label class="toggle">
+        <input type="checkbox" id="allDirectionsToggle" />
+        auch Gegenrichtung der Kern-Autobahnen anzeigen
+      </label>
+      <span class="last-updated" id="lastUpdated">Noch nicht geladen</span>
+    </section>
+
+    <section id="alertSection" aria-live="polite">
+      <div id="noClosures" class="banner banner-ok" hidden>
+        ✅ Aktuell keine gemeldete Vollsperrung auf dem Weg nach Nürnberg.
+      </div>
+      <div id="closureList" class="closure-list"></div>
+    </section>
+
+    <section id="errorBanner" class="banner banner-error" hidden></section>
+
+    <section class="stau-section" aria-live="polite">
+      <h2>Stauwarnungen</h2>
+      <div id="noStau" class="banner banner-ok" hidden>
+        ✅ Aktuell keine Stauwarnung in den offiziellen Meldungen.
+      </div>
+      <div id="stauList" class="closure-list"></div>
+    </section>
+
+    <section class="other-section">
+      <h2>Weitere Meldungen nach Autobahn (Baustellen, Sperrungen von Ein-/Ausfahrten, Warnungen)</h2>
+      <p class="map-note">
+        Innerhalb jeder Autobahn nach Bundesland sortiert — beginnend mit
+        Bayern, danach aufsteigend nach Entfernung zum Ziel in Nürnberg. Die
+        Zuordnung zum Bundesland erfolgt anhand der Meldungs-Koordinaten
+        (nächstgelegener Zentroid) und ist eine Näherung, keine exakte
+        Grenzprüfung.
+      </p>
+      <div id="otherList" class="other-list"></div>
+    </section>
+
+    <section class="map-section">
+      <h2>Live-Verkehrslage (Google Maps)</h2>
+      <p class="map-note">
+        Zeigt die farbliche Stauintensität von Google Maps rund um das Ziel
+        in Nürnberg — die einzige kostenlos verfügbare Live-Stauansicht, da
+        die offizielle Autobahn-API keine strukturierten Stau-Längen liefert.
+        Keine anklickbaren Sperrungs-/Unfall-Details — dafür gilt weiterhin
+        die Vollsperrungs-Liste oben als verlässliche Quelle.
+      </p>
+      <div id="trafficMap" class="traffic-map"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    Datenquelle: <a href="https://verkehr.autobahn.de" target="_blank" rel="noopener">Autobahn GmbH des Bundes — Open Data API</a>.
+    Automatische Aktualisierung alle 5 Minuten. Keine Gewähr für Vollständigkeit oder Aktualität — bitte offizielle Verkehrsmeldungen zusätzlich beachten.
+    <span class="footer-tag">FUTURISTIC BUILD</span>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script src="mini-view.js"></script>
+  <script src="traffic-map.js"></script>
+</body>
+</html>

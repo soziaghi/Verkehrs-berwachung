@@ -4,6 +4,10 @@ Reine Frontend-Web-App (kein Server/Build nötig), die Vollsperrungen und andere
 Verkehrsmeldungen auf den Autobahnrouten von 45 Firmenstandorten zum Ziel
 Koblenzerstr. 13, 90451 Nürnberg anzeigt.
 
+> 🆕 Eine futuristisch neugestaltete Kopie dieser Seite (gleiche Daten/Logik,
+> neues HUD-Design) liegt unter [`futuristic/`](futuristic/) und läuft unter
+> einer eigenen Adresse (`/futuristic/`), unabhängig von dieser Version.
+
 ## Nutzung
 
 Einfach `index.html` in einem Browser öffnen, oder lokal ausliefern:
