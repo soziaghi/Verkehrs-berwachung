@@ -21,9 +21,50 @@ const errorBanner = document.getElementById("errorBanner");
 const allDirectionsToggle = document.getElementById("allDirectionsToggle");
 const statusBadge = document.getElementById("statusBadge");
 const statusText = document.getElementById("statusText");
+const tabMainBtn = document.getElementById("tabMainBtn");
+const tabHiddenBtn = document.getElementById("tabHiddenBtn");
+const hiddenCount = document.getElementById("hiddenCount");
+const mainView = document.getElementById("mainView");
+const hiddenView = document.getElementById("hiddenView");
+const hiddenList = document.getElementById("hiddenList");
+const noHidden = document.getElementById("noHidden");
 
 let refreshTimer = null;
 let lastItems = [];
+let activeTab = "main";
+
+const HIDDEN_STORAGE_KEY = "ausgeblendeteMeldungen";
+
+function loadHiddenKeys() {
+  try {
+    const raw = localStorage.getItem(HIDDEN_STORAGE_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch (err) {
+    return new Set();
+  }
+}
+
+function saveHiddenKeys() {
+  try {
+    localStorage.setItem(HIDDEN_STORAGE_KEY, JSON.stringify([...hiddenKeys]));
+  } catch (err) {
+    // localStorage kann in manchen Kontexten (z. B. privates Fenster) fehlschlagen.
+  }
+}
+
+let hiddenKeys = loadHiddenKeys();
+
+function itemKey(item) {
+  return item.identifier || `${item.road}|${item.service}|${item.title || ""}|${item.subtitle || ""}`;
+}
+
+function setHidden(item, hidden) {
+  const key = itemKey(item);
+  if (hidden) hiddenKeys.add(key);
+  else hiddenKeys.delete(key);
+  saveHiddenKeys();
+  render(lastItems, []);
+}
 
 const NUERNBERG_COORD = { lat: 49.4521, lon: 11.0767 };
 
@@ -164,8 +205,11 @@ function render(items, failures) {
     return true;
   });
 
-  const closures = relevant.filter(isVollsperrung);
-  const remaining = relevant.filter((item) => !isVollsperrung(item));
+  const visible = relevant.filter((item) => !hiddenKeys.has(itemKey(item)));
+  const hidden = relevant.filter((item) => hiddenKeys.has(itemKey(item)));
+
+  const closures = visible.filter(isVollsperrung);
+  const remaining = visible.filter((item) => !isVollsperrung(item));
   const stauWarnungen = remaining.filter(isStauWarnung);
   const others = remaining.filter((item) => !isStauWarnung(item));
 
@@ -173,12 +217,35 @@ function render(items, failures) {
   renderClosures(closures);
   renderStauWarnungen(stauWarnungen);
   renderOthers(others);
+  renderHidden(hidden);
+  updateTabUI();
   if (typeof updateMiniView === "function") updateMiniView(closures, stauWarnungen);
 
   if (failures.length) {
     errorBanner.hidden = false;
     errorBanner.textContent = `Einige Daten konnten nicht geladen werden: ${failures.join(" · ")}`;
   }
+}
+
+function renderHidden(hiddenItems) {
+  hiddenCount.textContent = hiddenItems.length ? `(${hiddenItems.length})` : "";
+  hiddenList.innerHTML = "";
+  noHidden.hidden = hiddenItems.length > 0;
+  hiddenItems
+    .sort((a, b) => a.road.localeCompare(b.road))
+    .forEach((item) => {
+      let variant = "";
+      if (isVollsperrung(item)) variant = "closure";
+      else if (isStauWarnung(item)) variant = "stau";
+      hiddenList.appendChild(buildCard(item, variant, true));
+    });
+}
+
+function updateTabUI() {
+  mainView.hidden = activeTab !== "main";
+  hiddenView.hidden = activeTab !== "hidden";
+  tabMainBtn.classList.toggle("active", activeTab === "main");
+  tabHiddenBtn.classList.toggle("active", activeTab === "hidden");
 }
 
 function renderStatusBadge(closures, failures) {
@@ -268,9 +335,35 @@ function renderOthers(others) {
   });
 }
 
+function buildHideControl(item, hiddenView) {
+  const label = document.createElement("label");
+  label.className = "hide-control";
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = !!hiddenView;
+  checkbox.title = hiddenView
+    ? "Wieder auf dem Hauptbildschirm anzeigen"
+    : "Meldung ausblenden";
+  checkbox.addEventListener("click", (e) => e.stopPropagation());
+  checkbox.addEventListener("change", () => {
+    setHidden(item, checkbox.checked);
+  });
+  label.appendChild(checkbox);
+
+  const span = document.createElement("span");
+  span.textContent = hiddenView ? "Ausgeblendet" : "Ausblenden";
+  label.appendChild(span);
+
+  return label;
+}
+
 function buildRow(item) {
   const row = document.createElement("div");
   row.className = "row";
+
+  const rowMain = document.createElement("div");
+  rowMain.className = "row-main";
 
   const toggle = document.createElement("button");
   toggle.className = "row-toggle";
@@ -288,7 +381,9 @@ function buildRow(item) {
     toggle.appendChild(subtitle);
   }
 
-  row.appendChild(toggle);
+  rowMain.appendChild(toggle);
+  rowMain.appendChild(buildHideControl(item, false));
+  row.appendChild(rowMain);
 
   if (item.description && item.description.length) {
     const desc = document.createElement("div");
@@ -305,7 +400,7 @@ function buildRow(item) {
   return row;
 }
 
-function buildCard(item, variant) {
+function buildCard(item, variant, hiddenView) {
   const card = document.createElement("div");
   card.className = `card${variant ? ` ${variant}` : ""}`;
 
@@ -320,6 +415,8 @@ function buildCard(item, variant) {
   title.appendChild(badge);
   title.appendChild(document.createTextNode(item.title || "(ohne Titel)"));
   top.appendChild(title);
+
+  top.appendChild(buildHideControl(item, hiddenView));
 
   card.appendChild(top);
 
@@ -352,6 +449,14 @@ function buildCard(item, variant) {
 
 refreshBtn.addEventListener("click", () => loadAll().catch(showFatalError));
 allDirectionsToggle.addEventListener("change", () => render(lastItems, []));
+tabMainBtn.addEventListener("click", () => {
+  activeTab = "main";
+  updateTabUI();
+});
+tabHiddenBtn.addEventListener("click", () => {
+  activeTab = "hidden";
+  updateTabUI();
+});
 
 function showFatalError(err) {
   errorBanner.hidden = false;

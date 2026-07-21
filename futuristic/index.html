@@ -40,46 +40,68 @@
       <span class="last-updated" id="lastUpdated">Noch nicht geladen</span>
     </section>
 
-    <section id="alertSection" aria-live="polite">
-      <div id="noClosures" class="banner banner-ok" hidden>
-        ✅ Aktuell keine gemeldete Vollsperrung auf dem Weg nach Nürnberg.
-      </div>
-      <div id="closureList" class="closure-list"></div>
-    </section>
+    <nav class="tab-bar">
+      <button id="tabMainBtn" class="tab-btn active" type="button">Übersicht</button>
+      <button id="tabHiddenBtn" class="tab-btn" type="button">Ausgeblendet <span id="hiddenCount" class="tab-count"></span></button>
+    </nav>
 
-    <section id="errorBanner" class="banner banner-error" hidden></section>
+    <div id="mainView">
+      <section id="alertSection" aria-live="polite">
+        <div id="noClosures" class="banner banner-ok" hidden>
+          ✅ Aktuell keine gemeldete Vollsperrung auf dem Weg nach Nürnberg.
+        </div>
+        <div id="closureList" class="closure-list"></div>
+      </section>
 
-    <section class="stau-section" aria-live="polite">
-      <h2>Stauwarnungen</h2>
-      <div id="noStau" class="banner banner-ok" hidden>
-        ✅ Aktuell keine Stauwarnung in den offiziellen Meldungen.
-      </div>
-      <div id="stauList" class="closure-list"></div>
-    </section>
+      <section id="errorBanner" class="banner banner-error" hidden></section>
 
-    <section class="other-section">
-      <h2>Weitere Meldungen nach Autobahn (Baustellen, Sperrungen von Ein-/Ausfahrten, Warnungen)</h2>
-      <p class="map-note">
-        Innerhalb jeder Autobahn nach Bundesland sortiert — beginnend mit
-        Bayern, danach aufsteigend nach Entfernung zum Ziel in Nürnberg. Die
-        Zuordnung zum Bundesland erfolgt anhand der Meldungs-Koordinaten
-        (nächstgelegener Zentroid) und ist eine Näherung, keine exakte
-        Grenzprüfung.
-      </p>
-      <div id="otherList" class="other-list"></div>
-    </section>
+      <section class="stau-section" aria-live="polite">
+        <h2>Stauwarnungen</h2>
+        <div id="noStau" class="banner banner-ok" hidden>
+          ✅ Aktuell keine Stauwarnung in den offiziellen Meldungen.
+        </div>
+        <div id="stauList" class="closure-list"></div>
+      </section>
 
-    <section class="map-section">
-      <h2>Live-Verkehrslage (Google Maps)</h2>
-      <p class="map-note">
-        Zeigt die farbliche Stauintensität von Google Maps rund um das Ziel
-        in Nürnberg — die einzige kostenlos verfügbare Live-Stauansicht, da
-        die offizielle Autobahn-API keine strukturierten Stau-Längen liefert.
-        Keine anklickbaren Sperrungs-/Unfall-Details — dafür gilt weiterhin
-        die Vollsperrungs-Liste oben als verlässliche Quelle.
-      </p>
-      <div id="trafficMap" class="traffic-map"></div>
-    </section>
+      <section class="other-section">
+        <h2>Weitere Meldungen nach Autobahn (Baustellen, Sperrungen von Ein-/Ausfahrten, Warnungen)</h2>
+        <p class="map-note">
+          Innerhalb jeder Autobahn nach Bundesland sortiert — beginnend mit
+          Bayern, danach aufsteigend nach Entfernung zum Ziel in Nürnberg. Die
+          Zuordnung zum Bundesland erfolgt anhand der Meldungs-Koordinaten
+          (nächstgelegener Zentroid) und ist eine Näherung, keine exakte
+          Grenzprüfung.
+        </p>
+        <div id="otherList" class="other-list"></div>
+      </section>
+
+      <section class="map-section">
+        <h2>Live-Verkehrslage (Google Maps)</h2>
+        <p class="map-note">
+          Zeigt die farbliche Stauintensität von Google Maps rund um das Ziel
+          in Nürnberg — die einzige kostenlos verfügbare Live-Stauansicht, da
+          die offizielle Autobahn-API keine strukturierten Stau-Längen liefert.
+          Keine anklickbaren Sperrungs-/Unfall-Details — dafür gilt weiterhin
+          die Vollsperrungs-Liste oben als verlässliche Quelle.
+        </p>
+        <div id="trafficMap" class="traffic-map"></div>
+      </section>
+    </div>
+
+    <div id="hiddenView" hidden>
+      <section class="hidden-section" aria-live="polite">
+        <h2>Ausgeblendete Meldungen</h2>
+        <p class="map-note">
+          Meldungen, die per Kontrollkästchen ausgeblendet wurden. Häkchen
+          hier entfernen, um eine Meldung wieder auf den Hauptbildschirm
+          zurückzuholen.
+        </p>
+        <div id="noHidden" class="banner banner-ok" hidden>
+          Keine ausgeblendeten Meldungen.
+        </div>
+        <div id="hiddenList" class="closure-list"></div>
+      </section>
+    </div>
   </main>
 
   <footer class="app-footer">
