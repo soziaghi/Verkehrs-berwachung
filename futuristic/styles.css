@@ -585,6 +585,7 @@ body {
 }
 
 .toggle-desc {
+  display: block;
   background: none;
   border: none;
   color: var(--accent);
@@ -597,10 +598,11 @@ body {
 }
 
 .maps-btn {
-  display: inline-flex;
+  display: flex;
+  width: fit-content;
   align-items: center;
   gap: 0.35rem;
-  margin-top: 0.5rem;
+  margin-top: 0.85rem;
   padding: 0.3rem 0.65rem;
   border-radius: 6px;
   border: 1px solid var(--panel-border);
