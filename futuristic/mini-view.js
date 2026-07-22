@@ -17,13 +17,13 @@ const MINI_STYLES = `
   body {
     margin: 0;
     font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --mini-bg: #05070d;
+    --mini-bg: #170d08;
     background: var(--mini-bg);
-    color: #e6f7ff;
+    color: #f6ecdd;
     font-size: 0.78rem;
   }
   @keyframes mini-blink {
-    0%, 49% { background-color: #ff3b5c; }
+    0%, 49% { background-color: #e4432b; }
     50%, 100% { background-color: var(--mini-bg); }
   }
   body.mini-blinking {
@@ -38,7 +38,7 @@ const MINI_STYLES = `
     font-weight: 700;
     font-size: 0.85rem;
     letter-spacing: 0.03em;
-    border-bottom: 1px solid rgba(0,229,255,0.3);
+    border-bottom: 1px solid rgba(255, 181, 0,0.3);
     position: sticky;
     top: 0;
     background: inherit;
@@ -53,7 +53,7 @@ const MINI_STYLES = `
     border-radius: 4px;
     line-height: 1;
   }
-  .mini-gear:hover { background: rgba(0,229,255,0.18); }
+  .mini-gear:hover { background: rgba(255, 181, 0,0.18); }
   .mini-gear.active { opacity: 1; }
   .mini-ack-bar {
     display: none;
@@ -64,11 +64,11 @@ const MINI_STYLES = `
     background: #2a0d14;
     color: #ffb4c4;
     font-weight: 700;
-    border-bottom: 2px solid #ff3b5c;
+    border-bottom: 2px solid #e4432b;
   }
   body.mini-blinking .mini-ack-bar { display: flex; }
   .mini-ack-btn {
-    background: #ff3b5c;
+    background: #e4432b;
     color: white;
     border: none;
     padding: 0.3rem 0.6rem;
@@ -80,19 +80,19 @@ const MINI_STYLES = `
   }
   .mini-empty {
     padding: 0.6rem;
-    color: #7f92b0;
+    color: #c2a88c;
     font-style: italic;
   }
   .mini-item {
     padding: 0.4rem 0.6rem;
-    border-bottom: 1px solid rgba(0,229,255,0.12);
+    border-bottom: 1px solid rgba(255, 181, 0,0.12);
   }
-  .mini-item.closure { background: rgba(255,59,92,0.12); border-left: 3px solid #ff3b5c; }
-  .mini-item.stau { background: rgba(255,176,32,0.12); border-left: 3px solid #ffb020; }
+  .mini-item.closure { background: rgba(228, 67, 43,0.12); border-left: 3px solid #e4432b; }
+  .mini-item.stau { background: rgba(240, 134, 43,0.12); border-left: 3px solid #f0862b; }
   .mini-badge {
     display: inline-block;
-    background: linear-gradient(135deg, #00e5ff, #b026ff);
-    color: #000a10;
+    background: linear-gradient(135deg, #ffb500, #c9711f);
+    color: #1c1105;
     font-weight: 800;
     font-size: 0.68rem;
     padding: 0.05rem 0.35rem;
@@ -100,7 +100,7 @@ const MINI_STYLES = `
     margin-right: 0.3rem;
   }
   .mini-title { font-weight: 600; }
-  .mini-subtitle { color: #7f92b0; font-size: 0.72rem; display: block; margin-top: 0.1rem; }
+  .mini-subtitle { color: #c2a88c; font-size: 0.72rem; display: block; margin-top: 0.1rem; }
 `;
 
 function closureKey(closures) {
