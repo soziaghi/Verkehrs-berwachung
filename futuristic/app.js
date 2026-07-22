@@ -562,18 +562,28 @@ function buildCard(item, variant, hiddenView) {
   const top = document.createElement("div");
   top.className = "card-top";
 
-  const title = document.createElement("div");
-  title.className = "card-title";
+  const topLeft = document.createElement("div");
+  topLeft.className = "card-top-left";
+
   const badge = document.createElement("span");
   badge.className = "road-badge";
   badge.textContent = item.road;
-  title.appendChild(badge);
-  title.appendChild(document.createTextNode(item.title || "(ohne Titel)"));
-  top.appendChild(title);
+  topLeft.appendChild(badge);
 
+  if (variant === "closure" || variant === "stau") {
+    const mapsBtn = buildMapsButton(item);
+    if (mapsBtn) topLeft.appendChild(mapsBtn);
+  }
+
+  top.appendChild(topLeft);
   top.appendChild(buildHideControl(item, hiddenView));
 
   card.appendChild(top);
+
+  const title = document.createElement("div");
+  title.className = "card-title";
+  title.textContent = item.title || "(ohne Titel)";
+  card.appendChild(title);
 
   if (item.subtitle) {
     const subtitle = document.createElement("div");
@@ -597,11 +607,6 @@ function buildCard(item, variant, hiddenView) {
       toggleBtn.textContent = desc.hidden ? "Details anzeigen" : "Details ausblenden";
     });
     card.appendChild(toggleBtn);
-  }
-
-  if (variant === "closure" || variant === "stau") {
-    const mapsBtn = buildMapsButton(item);
-    if (mapsBtn) card.appendChild(mapsBtn);
   }
 
   return card;
