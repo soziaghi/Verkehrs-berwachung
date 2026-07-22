@@ -30,6 +30,14 @@ futuristische Version funktional von der Original-Version gelöst:
   Standorte deckte 13 zusätzliche Autobahnen auf (A10, A27, A33, A44,
   A45, A46, A485, A60, A66, A661, A67, A70, A72), die jetzt ebenfalls
   überwacht werden.
+- **Installierbar als PWA (iOS „Zum Home-Bildschirm“)**: `manifest.json`
+  + `sw.js` (Service Worker) + `icons/` machen die Seite auf dem iPhone
+  über Safari → Teilen → „Zum Home-Bildschirm“ installierbar — eigenes
+  App-Icon, Start im Vollbild ohne Safari-Leiste. Der Service Worker
+  cached nur die App-Shell (HTML/CSS/JS/Icons) für einen Offline-Start;
+  Verkehrsdaten (Autobahn-API, Google Maps) kommen weiterhin immer live
+  aus dem Netz. Eine native App-Store-App (z. B. via Capacitor/Xcode)
+  ist als nächster Schritt geplant, aber separat von dieser PWA.
 
 ## Nutzung
 
