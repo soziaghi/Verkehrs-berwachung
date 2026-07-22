@@ -543,6 +543,18 @@ function buildRow(item) {
   return row;
 }
 
+function buildMapsButton(item) {
+  const coord = itemCoord(item);
+  if (!coord) return null;
+  const link = document.createElement("a");
+  link.className = "maps-btn";
+  link.href = `https://www.google.com/maps/search/?api=1&query=${coord.lat},${coord.lon}`;
+  link.target = "_blank";
+  link.rel = "noopener";
+  link.textContent = "📍 Auf Google Maps anzeigen";
+  return link;
+}
+
 function buildCard(item, variant, hiddenView) {
   const card = document.createElement("div");
   card.className = `card${variant ? ` ${variant}` : ""}`;
@@ -585,6 +597,11 @@ function buildCard(item, variant, hiddenView) {
       toggleBtn.textContent = desc.hidden ? "Details anzeigen" : "Details ausblenden";
     });
     card.appendChild(toggleBtn);
+  }
+
+  if (variant === "closure" || variant === "stau") {
+    const mapsBtn = buildMapsButton(item);
+    if (mapsBtn) card.appendChild(mapsBtn);
   }
 
   return card;

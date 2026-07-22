@@ -596,6 +596,30 @@ body {
   letter-spacing: 0.03em;
 }
 
+.maps-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid var(--panel-border);
+  background: var(--panel-solid);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-family: "Orbitron", sans-serif;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.maps-btn:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+}
+
 .other-section h2,
 .stau-section h2 {
   font-size: 0.8rem;
