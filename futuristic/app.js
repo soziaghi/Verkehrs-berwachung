@@ -1,11 +1,11 @@
 // Kern-Autobahnen: führen direkt auf Nürnberg zu, "Richtung Nürnberg"-Textfilter bleibt aktiv.
 const CORE_ROADS = ["A3", "A6", "A9", "A73", "A93"];
 // Zubringer-Autobahnen: liegen zu weit von Nürnberg entfernt für einen Richtungs-Textfilter,
-// daher werden hier beide Richtungen angezeigt. Die letzten 13 (A10 … A72) kamen über die
+// daher werden hier beide Richtungen angezeigt. Die Roads ab A10 kamen über die
 // Center/Tour-Standortauswertung (routenbasiert per OSRM) als zusätzlich relevant hinzu.
 const FEEDER_ROADS = [
   "A1", "A2", "A4", "A5", "A7", "A8", "A13", "A71", "A81", "A92", "A95", "A99", "A113",
-  "A10", "A27", "A33", "A44", "A45", "A46", "A485", "A60", "A66", "A661", "A67", "A70", "A72",
+  "A10", "A27", "A33", "A42", "A44", "A45", "A46", "A485", "A60", "A66", "A661", "A67", "A70", "A72",
 ];
 const ROADS = [...CORE_ROADS, ...FEEDER_ROADS];
 const SERVICES = ["roadworks", "closure", "warning"];
