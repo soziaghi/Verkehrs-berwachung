@@ -542,13 +542,20 @@ body {
 .card-top {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.5rem;
 }
 
-.card-title {
-  flex: 1 1 auto;
+.card-top-left {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
   min-width: 0;
+}
+
+.card-title {
+  margin-top: 0.5rem;
   font-weight: 700;
   font-size: 0.88rem;
   letter-spacing: 0.01em;
@@ -565,8 +572,8 @@ body {
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.03em;
-  margin-right: 0.4rem;
   font-family: "Orbitron", sans-serif;
+  line-height: 1.4;
 }
 
 .card-subtitle {
@@ -599,22 +606,22 @@ body {
 }
 
 .maps-btn {
-  display: flex;
-  width: fit-content;
+  display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  margin-top: 0.85rem;
-  padding: 0.3rem 0.65rem;
-  border-radius: 6px;
+  gap: 0.3rem;
+  padding: 0.08rem 0.5rem;
+  border-radius: 4px;
   border: 1px solid var(--panel-border);
   background: var(--panel-solid);
   color: var(--accent);
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   text-decoration: none;
   font-family: "Orbitron", sans-serif;
+  line-height: 1.4;
+  white-space: nowrap;
   transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
