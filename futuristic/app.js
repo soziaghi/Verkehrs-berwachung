@@ -38,9 +38,13 @@ const tourFilter = document.getElementById("tourFilter");
 const ortFilter = document.getElementById("ortFilter");
 const resetFilterBtn = document.getElementById("resetFilterBtn");
 const filterInfo = document.getElementById("filterInfo");
+const tomtomStatus = document.getElementById("tomtomStatus");
 
 let refreshTimer = null;
+let tomtomRefreshTimer = null;
 let lastItems = [];
+let lastAutobahnItems = [];
+let lastTomTomItems = [];
 let activeTab = "main";
 let selectedCenter = "";
 let selectedTour = "";
@@ -287,10 +291,33 @@ async function loadAll() {
     else failures.push(r.reason?.message || String(r.reason));
   });
 
-  lastItems = items;
-  render(items, failures);
+  lastAutobahnItems = items;
+  lastItems = [...lastAutobahnItems, ...lastTomTomItems];
+  render(lastItems, failures);
   setLoading(false);
   lastUpdated.textContent = `Zuletzt aktualisiert: ${new Date().toLocaleTimeString("de-DE")}`;
+}
+
+async function loadTomTom() {
+  if (typeof loadTomTomIncidents !== "function") return;
+  if (!TOMTOM_API_KEY) {
+    tomtomStatus.textContent = "TomTom: nicht konfiguriert";
+    return;
+  }
+
+  tomtomStatus.textContent = "TomTom: lädt…";
+  try {
+    const { items, failures } = await loadTomTomIncidents();
+    lastTomTomItems = items;
+    lastItems = [...lastAutobahnItems, ...lastTomTomItems];
+    render(lastItems, []);
+    tomtomStatus.textContent = failures.length
+      ? `TomTom: ${items.length} Meldungen (${failures.length} Kacheln fehlgeschlagen)`
+      : `TomTom: ${items.length} Meldungen · ${new Date().toLocaleTimeString("de-DE")}`;
+  } catch (err) {
+    console.error("TomTom-Daten konnten nicht geladen werden:", err);
+    tomtomStatus.textContent = "TomTom: Fehler beim Laden";
+  }
 }
 
 function setLoading(loading) {
@@ -303,6 +330,9 @@ function render(items, failures) {
   const showAllDirections = allDirectionsToggle.checked;
   const relevant = items.filter((item) => {
     if (showAllDirections) return true;
+    // TomTom liefert keinen "Richtung Nürnberg"-Text, an dem sich die
+    // Fahrtrichtung erkennen ließe — Items dieser Quelle immer anzeigen.
+    if (item.service === "tomtom") return true;
     if (CORE_ROADS.includes(item.road)) return isDirectionNuernberg(item);
     return true;
   });
@@ -660,5 +690,13 @@ function startAutoRefresh() {
   refreshTimer = setInterval(() => loadAll().catch(showFatalError), REFRESH_INTERVAL_MS);
 }
 
+function startTomTomAutoRefresh() {
+  if (typeof TOMTOM_REFRESH_INTERVAL_MS === "undefined") return;
+  if (tomtomRefreshTimer) clearInterval(tomtomRefreshTimer);
+  tomtomRefreshTimer = setInterval(() => loadTomTom(), TOMTOM_REFRESH_INTERVAL_MS);
+}
+
 loadAll().catch(showFatalError);
 startAutoRefresh();
+loadTomTom();
+startTomTomAutoRefresh();
