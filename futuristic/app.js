@@ -124,6 +124,8 @@ function buildRoadStatusGrid() {
   ROADS.forEach((road) => {
     const tile = document.createElement("div");
     tile.className = "road-tile status-ok";
+    tile.tabIndex = 0;
+    tile.setAttribute("role", "button");
 
     const label = document.createElement("span");
     label.className = "road-tile-label";
@@ -134,11 +136,41 @@ function buildRoadStatusGrid() {
     bar.className = "road-tile-bar";
     tile.appendChild(bar);
 
+    tile.addEventListener("click", () => jumpToRoadMeldung(road));
+    tile.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        jumpToRoadMeldung(road);
+      }
+    });
+
     roadStatusGrid.appendChild(tile);
     roadStatusTiles.set(road, tile);
   });
 }
 buildRoadStatusGrid();
+
+// Springt von einer Autobahn-Status-Kachel zur zugehörigen Meldung: zuerst
+// Vollsperrung, dann Stau, dann "weitere Meldungen" — was zuerst existiert.
+function jumpToRoadMeldung(road) {
+  const selector = `[data-road="${CSS.escape(road)}"]`;
+  const target =
+    closureList.querySelector(selector) ||
+    stauList.querySelector(selector) ||
+    otherList.querySelector(selector);
+  if (!target) return;
+
+  if (target.tagName === "DETAILS") {
+    target.open = true;
+    target.querySelectorAll(":scope > .land-group").forEach((land) => {
+      land.open = true;
+    });
+  }
+
+  target.scrollIntoView({ behavior: "smooth", block: "center" });
+  target.classList.add("jump-highlight");
+  setTimeout(() => target.classList.remove("jump-highlight"), 1600);
+}
 
 const HIDDEN_STORAGE_KEY = "ausgeblendeteMeldungen";
 
@@ -477,6 +509,7 @@ function renderOthers(others) {
 
     const details = document.createElement("details");
     details.className = "road-group";
+    details.dataset.road = road;
 
     const summary = document.createElement("summary");
     summary.textContent = `${road} `;
@@ -598,6 +631,7 @@ function buildMapsButton(item) {
 function buildCard(item, variant, hiddenView) {
   const card = document.createElement("div");
   card.className = `card${variant ? ` ${variant}` : ""}`;
+  card.dataset.road = item.road;
 
   const top = document.createElement("div");
   top.className = "card-top";
