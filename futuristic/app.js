@@ -37,6 +37,7 @@ const centerFilter = document.getElementById("centerFilter");
 const tourFilter = document.getElementById("tourFilter");
 const ortFilter = document.getElementById("ortFilter");
 const resetFilterBtn = document.getElementById("resetFilterBtn");
+const hideRoadworksBtn = document.getElementById("hideRoadworksBtn");
 const filterInfo = document.getElementById("filterInfo");
 const tomtomStatus = document.getElementById("tomtomStatus");
 
@@ -266,6 +267,15 @@ function isVollsperrung(item) {
 function isStauWarnung(item) {
   const fullText = `${item.title || ""} ${item.subtitle || ""} ${(item.description || []).join(" ")}`.toLowerCase();
   return /\bstau\b|staugefahr|stockender verkehr|zähfließend|zaehfliessend|verkehr staut/.test(fullText);
+}
+
+// Baustellen-Meldungen, die (noch) nicht als Vollsperrung/Stau eingestuft
+// sind — jene bleiben bewusst sichtbar, auch wenn ihre Ursache Bauarbeiten
+// sind.
+function isBaustelle(item) {
+  if (isVollsperrung(item) || isStauWarnung(item)) return false;
+  if (item.service === "tomtom") return /^Baustelle\b/.test(item.title || "");
+  return item.service === "roadworks";
 }
 
 async function fetchRoadService(road, service) {
@@ -676,6 +686,13 @@ resetFilterBtn.addEventListener("click", () => {
   selectedOrt = "";
   refreshFilterOptions();
   updateFilterInfo();
+  render(lastItems, []);
+});
+hideRoadworksBtn.addEventListener("click", () => {
+  lastItems.forEach((item) => {
+    if (isBaustelle(item)) hiddenKeys.add(itemKey(item));
+  });
+  saveHiddenKeys();
   render(lastItems, []);
 });
 
