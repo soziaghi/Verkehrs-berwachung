@@ -9,5 +9,9 @@ const GOOGLE_MAPS_API_KEY = "AIzaSyADS0hFwWINAhlumYchHPia-xi9aYz-UV8";
 // auf die eigene Adresse absichern, nicht durch Geheimhalten. Leer lassen
 // ("") um die TomTom-Anbindung zu deaktivieren — sie wird dann automatisch
 // übersprungen, ohne Fehler zu werfen.
-const TOMTOM_API_KEY = "zw3HznOBTq5e5Uedv3niPmT1mgLLGIlT";
+//
+// Vorübergehend deaktiviert: der Key hat keine Credits mehr (TomTom-API
+// antwortet mit HTTP 403 "InsufficientFunds"). Sobald das Konto aufgeladen
+// oder ein neuer Key vorhanden ist, hier wieder eintragen.
+const TOMTOM_API_KEY = "";
 
